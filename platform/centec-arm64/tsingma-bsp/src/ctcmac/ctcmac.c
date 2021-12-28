@@ -951,6 +951,12 @@ static void ctcmac_hw_init(struct ctcmac_private *priv)
 		     CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_AN_ENABLE);
 		writel(val, &priv->cpumac_reg->cpu_mac_sgmii_auto_neg_cfg);
 	}
+
+	clrsetbits(&priv->cpumac_reg->CpuMacSgmiiAutoNegCfg, 
+			0, BIT(CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_IGNORE_ANEG_ERR_BIT));
+	clrsetbits(&priv->cpumac_reg->CpuMacSgmiiAutoNegCfg, 
+			0, BIT(CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_IGNORE_LINK_FAILURE_BIT));
+
 	/* disable rx link filter */
 	clrsetbits(&priv->cpumac_reg->cpu_mac_sgmii_cfg[0],
 		   CPU_MAC_SGMII_CFG_W0_CFG_MII_RX_LINK_FILTER_EN, 0);
