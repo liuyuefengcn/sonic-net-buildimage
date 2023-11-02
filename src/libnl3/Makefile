@@ -16,7 +16,11 @@ DERIVED_TARGETS = libnl-3-dev_$(LIBNL3_VERSION)_$(CONFIGURED_ARCH).deb \
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	# Obtaining the libnl3
 	rm -rf ./libnl3-$(LIBNL3_VERSION_BASE)
-	git clone https://github.com/thom311/libnl libnl3-$(LIBNL3_VERSION_BASE)
+	while [ ! -d libnl3-$(LIBNL3_VERSION_BASE) ]; do \
+	git clone https://github.com/thom311/libnl libnl3-$(LIBNL3_VERSION_BASE) || true; \
+	echo "Command failed, retrying in 10 seconds"; \    
+	sleep 10; \
+	done
 	pushd libnl3-$(LIBNL3_VERSION_BASE)
 	git checkout tags/libnl$(subst .,_,$(LIBNL3_VERSION_BASE))
 

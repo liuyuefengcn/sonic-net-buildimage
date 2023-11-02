@@ -80,6 +80,8 @@ RUN PATH=/python_virtualenv/env3/bin/:$PATH python3 -m pip uninstall -y enum34
 RUN PATH=/python_virtualenv/env3/bin/:$PATH pip3 install --force-reinstall --no-cache-dir coverage
 {%- endif %}
 
+RUN apt-get install -y debian-keyring debian-archive-keyring
+RUN apt-key update
 RUN apt-get update && apt-get install -y \
         apt-utils \
         default-jre-headless \
@@ -576,7 +578,8 @@ RUN mkdir /var/run/sshd
 EXPOSE 22
 
 # Install depot-tools (for git-retry)
-RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/share/depot_tools
+# RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/share/depot_tools
+RUN git clone https://gitee.com/mirrors_chromium_googlesource/depot_tools.git /usr/share/depot_tools
 ENV PATH /usr/share/depot_tools:$PATH
 
 # Install dependencies for dhcp relay test
@@ -612,7 +615,12 @@ RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
 RUN pip3 install m2crypto==0.36.0
 
 # Install swi tools
-RUN pip3 install git+https://github.com/aristanetworks/swi-tools.git@bead66bf261770237f7dd21ace3774ba04a017e9
+#RUN pip3 install git+https://github.com/aristanetworks/swi-tools.git@bead66bf261770237f7dd21ace3774ba04a017e9
+RUN while true; do \
+    pip3 install git+https://github.com/aristanetworks/swi-tools.git@bead66bf261770237f7dd21ace3774ba04a017e9 && break; \
+    echo "Command failed, retrying in 10 seconds"; \
+    sleep 10; \
+    done
 
 {% if CONFIGURED_ARCH != "amd64" -%}
 # Install node.js for azure pipeline
@@ -641,7 +649,12 @@ LABEL "com.azure.dev.pipelines.agent.handler.node.path"="/usr/bin/node"
 # TODO(PINS): Remove once pre-build Bazel binaries are available for armhf (armv7l)
 {%- if CONFIGURED_ARCH == "amd64" or CONFIGURED_ARCH == "arm64" %}
 ARG bazelisk_url=https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-{{ CONFIGURED_ARCH }}
-RUN curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel
+#RUN curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel
+RUN while true; do \
+    curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel && break; \
+    echo "Command failed, retrying in 10 seconds"; \
+    sleep 10; \
+    done
 # Bazel requires "python"
 # TODO(PINS): remove when Bazel is okay with "python3" binary name
 RUN apt install -y python-is-python3

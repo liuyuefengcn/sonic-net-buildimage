@@ -263,13 +263,13 @@ RUN apt-get -y build-dep linux
 # For gobgp and telemetry build
 RUN export VERSION=1.15.15 \
 {%- if CONFIGURED_ARCH == "armhf" %}
- && wget https://storage.googleapis.com/golang/go$VERSION.linux-armv6l.tar.gz \
+ && wget https://dl.google.com/go/go$VERSION.linux-armv6l.tar.gz \ 
  && tar -C /usr/local -xzf go$VERSION.linux-armv6l.tar.gz \
 {%- elif CONFIGURED_ARCH == "arm64" %}
- && wget https://storage.googleapis.com/golang/go$VERSION.linux-arm64.tar.gz \
+ && wget https://dl.google.com/go/go$VERSION.linux-arm64.tar.gz \
  && tar -C /usr/local -xzf go$VERSION.linux-arm64.tar.gz \
 {%- else %}
- && wget https://storage.googleapis.com/golang/go$VERSION.linux-amd64.tar.gz \
+ && wget https://dl.google.com/go/go$VERSION.linux-amd64.tar.gz \
  && tar -C /usr/local -xzf go$VERSION.linux-amd64.tar.gz \
 {%- endif %}
  && echo 'export GOROOT=/usr/local/go' >> /etc/bash.bashrc \
@@ -319,7 +319,8 @@ RUN mkdir /var/run/sshd
 EXPOSE 22
 
 # Install depot-tools (for git-retry)
-RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/share/depot_tools
+#RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /usr/share/depot_tools
+RUN git clone https://gitee.com/mirrors_chromium_googlesource/depot_tools.git /usr/share/depot_tools
 ENV PATH /usr/share/depot_tools:$PATH
 
 # Install docker engine 17.03.2~ce-0 inside docker and enable experimental feature
@@ -354,11 +355,21 @@ RUN apt-get -y -o Acquire::Check-Valid-Until=false install ca-certificates-java=
 RUN pip install m2crypto==0.36.0
 
 # Install swi tools
-RUN python -m pip install git+https://github.com/aristanetworks/swi-tools.git@d51761ec0bb93c73039233f3c01ed48235ffad00
+#RUN python -m pip install git+https://github.com/aristanetworks/swi-tools.git@d51761ec0bb93c73039233f3c01ed48235ffad00
+RUN while true; do \
+    python -m pip install git+https://github.com/aristanetworks/swi-tools.git@d51761ec0bb93c73039233f3c01ed48235ffad00  && break; \
+    echo "Command failed, retrying in 10 seconds"; \
+    sleep 10; \
+    done
 
 # Install Bazel build system (amd64 and arm64 architectures are supported using this method)
 # TODO(PINS): Remove once pre-build Bazel binaries are available for armhf (armv7l)
 {%- if CONFIGURED_ARCH == "amd64" or CONFIGURED_ARCH == "arm64" %}
 ARG bazelisk_url=https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-{{ CONFIGURED_ARCH }}
-RUN curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel
+#RUN curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel
+RUN while true; do \
+    curl -fsSL -o /usr/local/bin/bazel ${bazelisk_url} && chmod 755 /usr/local/bin/bazel && break; \
+    echo "Command failed, retrying in 10 seconds"; \
+    sleep 10; \
+    done
 {% endif -%}
