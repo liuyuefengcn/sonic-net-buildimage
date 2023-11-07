@@ -7,7 +7,10 @@ MAIN_TARGET = $(PSAMPLE)
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 
 	rm -fr ./libpsample
-	git clone https://github.com/Mellanox/libpsample.git
+	@until git clone https://github.com/Mellanox/libpsample.git; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	cp -r debian libpsample
 
 	pushd ./libpsample

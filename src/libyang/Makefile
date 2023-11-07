@@ -8,7 +8,11 @@ DERIVED_TARGETS = $(LIBYANG_DEV) $(LIBYANG_DBGSYM) $(LIBYANG_PY3) $(LIBYANG_CPP)
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
         # Obtaining the libyang
 	rm -fr ./libyang-$(LIBYANG_VERSION)
+	for i in {1..500}; do
 	git clone https://github.com/CESNET/libyang.git libyang-$(LIBYANG_VERSION)
+	echo "git clone failed, retrying..."
+	sleep 10
+	done
 	pushd libyang-$(LIBYANG_VERSION)
 	git checkout tags/v1.0-r4 -b libyang
 	# Apply patch series

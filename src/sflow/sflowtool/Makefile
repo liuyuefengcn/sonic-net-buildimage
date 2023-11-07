@@ -7,7 +7,10 @@ MAIN_TARGET = $(SFLOWTOOL)
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 
 	rm -fr ./sflowtool
-	git clone https://github.com/sflow/sflowtool
+	@until git clone https://github.com/sflow/sflowtool; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	cp -r debian sflowtool
 
 	pushd ./sflowtool

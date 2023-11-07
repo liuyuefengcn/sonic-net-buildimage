@@ -8,7 +8,10 @@ MAIN_TARGET = $(FLASHROM)
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	rm -rf ./flashrom-$(FLASHROM_VERSION_FULL)
 	# Obtain flashrom
-	git clone https://github.com/flashrom/flashrom.git flashrom-$(FLASHROM_VERSION_FULL)
+	@until git clone https://github.com/flashrom/flashrom.git flashrom-$(FLASHROM_VERSION_FULL); do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	pushd ./flashrom-$(FLASHROM_VERSION_FULL)
 
 	# Check out tag: tags/0.9.7

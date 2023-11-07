@@ -7,8 +7,10 @@ DERIVED_TARGET = $(HSFLOWD_DBG)
 
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	rm -fr ./host-sflow
-	git clone https://github.com/sflow/host-sflow
-
+	@until git clone https://github.com/sflow/host-sflow; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	pushd ./host-sflow
 	git checkout -b sflow tags/v$(HSFLOWD_VERSION)-$(HSFLOWD_SUBVERSION)
 

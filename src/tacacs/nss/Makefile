@@ -7,7 +7,10 @@ MAIN_TARGET = libnss-tacplus_$(NSS_TACPLUS_VERSION)_$(CONFIGURED_ARCH).deb
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	# Obtain libnss-tacplus
 	rm -rf ./libnss-tacplus
-	git clone https://github.com/daveolson53/libnss-tacplus.git
+	@until git clone https://github.com/daveolson53/libnss-tacplus.git; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	pushd ./libnss-tacplus
 	git checkout -b test -f 19008ab
 

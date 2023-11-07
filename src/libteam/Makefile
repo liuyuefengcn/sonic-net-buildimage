@@ -13,7 +13,12 @@ DERIVED_TARGETS = libteam-dev_$(LIBTEAM_VERSION)_$(CONFIGURED_ARCH).deb \
 $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	# Obtain libteam
 	rm -rf ./libteam
-	git clone https://github.com/jpirko/libteam.git
+	echo "start git clone libteam"
+	@until git clone https://github.com/jpirko/libteam.git; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
+	echo "end git clone libteam"
 	pushd ./libteam
 	git checkout -b teamd -f c7237377dead39ae4a711297203bacf7edb9fa41
 
@@ -23,7 +28,12 @@ $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	popd
 
 	# Obtain debian packaging
-	git clone https://salsa.debian.org/debian/libteam.git tmp
+	echo "start git clone libteam2"
+	@until git clone https://salsa.debian.org/debian/libteam.git tmp; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
+	echo "end git clone libteam2"
 	pushd ./tmp
 	git checkout -f debian/1.30-1
 	popd

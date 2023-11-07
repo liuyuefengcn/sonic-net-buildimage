@@ -8,7 +8,10 @@ $(addprefix $(DEST)/, $(MAIN_TARGET)): $(DEST)/% :
 	# Build freeradius-server v1.1.x
 	pushd freeradius
 	-rm -rf freeradius-server
-	git clone https://github.com/FreeRADIUS/freeradius-server.git
+	@until git clone https://github.com/FreeRADIUS/freeradius-server.git; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	popd
 	pushd freeradius/freeradius-server
 	git checkout -f 5f715dba4d2dbdb268bf60fcc656352274930941
@@ -29,7 +32,10 @@ endif
 
 	# Obtain pam_radius
 	-rm -rf ./pam_radius
-	git clone https://github.com/FreeRADIUS/pam_radius.git
+	@until git clone https://github.com/FreeRADIUS/pam_radius.git; do \
+	echo "git clone failed, retrying..."; \
+	sleep 10; \
+	done
 	pushd ./pam_radius
 	# This is the latest commit with Radius MPL support
 	git checkout -f 149c25df84cf5cd0e9addd9346699a9ca8fdddd2
