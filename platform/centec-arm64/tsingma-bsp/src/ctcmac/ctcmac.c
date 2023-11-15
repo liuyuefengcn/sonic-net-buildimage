@@ -654,6 +654,11 @@ static int ctcmac_maximize_margin_of_cmu_tempearture_ramp(struct ctcmac_private
 		return -1;
 	}
 
+	ctc_mac_hss_read(priv, 0x1c, &val, 2);
+	val &= 0xf8;
+	val |= 0x4;
+	ctc_mac_hss_write(priv, 0x1c, val, 2);
+
 	/*r_pll_dlol_en  0x30[0] write 1    enable pll lol status output */
 	ctc_mac_hss_read(priv, 0x30, &val, 2);
 	val |= BIT(0);
@@ -708,7 +713,6 @@ static int ctcmac_maximize_margin_of_cmu_tempearture_ramp(struct ctcmac_private
 /* serdes init flow */
 static int ctc_mac_serdes_init(struct ctcmac_private *priv)
 {
-	u8 val = 0;
 	int ret = 0;
 	u32 status;
 	int delay_ms = 10;
@@ -858,11 +862,6 @@ static int ctc_mac_serdes_init(struct ctcmac_private *priv)
 	ctc_mac_hss_write(priv, 0x14, 0x01, 1);
 	ctc_mac_hss_write(priv, 0x26, 0x81, 1);
 
-	ctc_mac_hss_read(priv, 0x1c, &val, 2);
-	val &= 0xf8;
-	val |= 0x4;
-	ctc_mac_hss_write(priv, 0x1c, val, 2);
-
 	/* serdes post release */
 	writel(0x83806003, &priv->cpumacu_reg->cpu_mac_unit_hss_cfg[0]);
 	writel(0x83826003, &priv->cpumacu_reg->cpu_mac_unit_hss_cfg[0]);
@@ -951,12 +950,6 @@ static void ctcmac_hw_init(struct ctcmac_private *priv)
 		     CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_AN_ENABLE);
 		writel(val, &priv->cpumac_reg->cpu_mac_sgmii_auto_neg_cfg);
 	}
-
-	clrsetbits(&priv->cpumac_reg->CpuMacSgmiiAutoNegCfg, 
-			0, BIT(CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_IGNORE_ANEG_ERR_BIT));
-	clrsetbits(&priv->cpumac_reg->CpuMacSgmiiAutoNegCfg, 
-			0, BIT(CPU_MAC_SGMII_AUTO_NEG_CFG_W0_CFG_IGNORE_LINK_FAILURE_BIT));
-
 	/* disable rx link filter */
 	clrsetbits(&priv->cpumac_reg->cpu_mac_sgmii_cfg[0],
 		   CPU_MAC_SGMII_CFG_W0_CFG_MII_RX_LINK_FILTER_EN, 0);
